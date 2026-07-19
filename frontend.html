@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCP Gateway · Insignytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07080f;
+            --surface: #0d0f1a;
+            --surface2: #13152a;
+            --border: #1e2240;
+            --border-hi: #2d3165;
+            --text: #e8eaf6;
+            --muted: #5c6080;
+            --violet: #8b5cf6;
+            --violet-dim: #4c1d95;
+            --green: #22c55e;
+            --green-dim: #14532d;
+            --red: #f87171;
+            --red-dim: #7f1d1d;
+            --amber: #fbbf24;
+            --blue: #60a5fa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* ── Header ─────────────────────────────────────────── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(7, 8, 15, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .logo-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #6d28d9, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 0 16px rgba(109, 40, 217, 0.4);
+        }
+
+        .logo-text {
+            line-height: 1.2;
+        }
+
+        .logo-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .logo-sub {
+            font-size: 0.68rem;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .server-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.35rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--muted);
+            transition: all 0.3s;
+        }
+
+        .server-pill.online {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .server-pill.offline {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .pulse {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--muted);
+            transition: background 0.3s;
+        }
+
+        .online .pulse {
+            background: var(--green);
+            animation: blink 2s infinite;
+        }
+
+        .offline .pulse {
+            background: var(--red);
+            animation: none;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .3
+            }
+        }
+
+        /* ── Main ────────────────────────────────────────────── */
+        .main {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        /* ── Hero ────────────────────────────────────────────── */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--violet);
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 20px;
+            padding: 0.2rem 0.75rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 0.9rem;
+            background: linear-gradient(135deg, #e8eaf6 30%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 480px;
+            margin: 0 auto 1.8rem;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── Buttons ─────────────────────────────────────────── */
+        .btn {
+            padding: 0.55rem 1.3rem;
+            border-radius: 7px;
+            border: 1px solid transparent;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6d28d9, #4f46e5);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(109, 40, 217, 0.3);
+        }
+
+        .btn-primary:not(:disabled):hover {
+            box-shadow: 0 0 28px rgba(109, 40, 217, 0.55);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--border-hi);
+            color: var(--muted);
+        }
+
+        .btn-ghost:not(:disabled):hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.85rem;
+            font-size: 0.78rem;
+            background: var(--surface2);
+            border-color: var(--border-hi);
+            color: var(--text);
+        }
+
+        .btn-sm:not(:disabled):hover {
+            border-color: var(--violet);
+            color: var(--violet);
+        }
+
+        /* ── Steps ───────────────────────────────────────────── */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .step-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            overflow: hidden;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .step-card.active {
+            border-color: var(--violet);
+            box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.15), 0 4px 24px rgba(139, 92, 246, 0.1);
+        }
+
+        .step-card.done {
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .step-card.errored {
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+        }
+
+        .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1.5px solid var(--border-hi);
+            color: var(--muted);
+            background: var(--surface2);
+            transition: all 0.3s;
+        }
+
+        .step-card.active .step-num {
+            border-color: var(--violet);
+            color: var(--violet);
+            background: rgba(139, 92, 246, 0.12);
+        }
+
+        .step-card.done .step-num {
+            border-color: var(--green);
+            color: #000;
+            background: var(--green);
+        }
+
+        .step-card.errored .step-num {
+            border-color: var(--red);
+            color: #fff;
+            background: var(--red);
+        }
+
+        .step-meta {
+            flex: 1;
+        }
+
+        .step-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 0.92rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .step-desc {
+            font-size: 0.76rem;
+            color: var(--muted);
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-hi);
+            border-top-color: var(--violet);
+            border-radius: 50%;
+            animation: spin 0.55s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Result panel ────────────────────────────────────── */
+        .step-body {
+            display: none;
+            padding: 0 1.25rem 1.25rem;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .step-body.open {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        /* ── Result primitives ───────────────────────────────── */
+        .kv-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .kv {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0.65rem 0.85rem;
+        }
+
+        .kv-label {
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 0.3rem;
+        }
+
+        .kv-val {
+            font-size: 0.84rem;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .kv-val.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .pill-green {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--green);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .pill-red {
+            background: rgba(248, 113, 113, 0.12);
+            color: var(--red);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        .pill-violet {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--violet);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+        }
+
+        .pill-amber {
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--amber);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .pill-blue {
+            background: rgba(96, 165, 250, 0.12);
+            color: var(--blue);
+            border: 1px solid rgba(96, 165, 250, 0.25);
+        }
+
+        /* MCP flow */
+        .flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0.7rem 0.9rem;
+        }
+
+        .flow-icon {
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+
+        .flow-body {
+            flex: 1;
+        }
+
+        .flow-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .flow-detail {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Live data callout */
+        .live-box {
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 8px;
+            padding: 1rem 1.1rem;
+            background: rgba(139, 92, 246, 0.05);
+            box-shadow: 0 0 24px rgba(139, 92, 246, 0.08);
+            margin-bottom: 0.75rem;
+        }
+
+        .live-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--violet);
+            margin-bottom: 0.6rem;
+        }
+
+        .live-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .live-stat-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .live-stat-key {
+            font-size: 0.68rem;
+            color: var(--muted);
+            margin-top: 0.15rem;
+        }
+
+        /* Explain box */
+        .explain {
+            background: rgba(96, 165, 250, 0.04);
+            border: 1px solid rgba(96, 165, 250, 0.12);
+            border-radius: 7px;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.77rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .explain strong {
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        /* Blocked list */
+        .blocked-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .blocked-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0.65rem 0.9rem;
+        }
+
+        .blocked-label {
+            font-size: 0.82rem;
+        }
+
+        .blocked-label code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        /* ── Footer ──────────────────────────────────────────── */
+        .footer {
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Header ───────────────────────────────────────── -->
+    <header class="header">
+        <div class="logo-row">
+            <div class="logo-mark">⚡</div>
+            <div class="logo-text">
+                <div class="logo-name">MCP Gateway</div>
+                <div class="logo-sub">Insignytics · AI Agent Infrastructure</div>
+            </div>
+        </div>
+        <div class="server-pill" id="serverPill">
+            <div class="pulse"></div>
+            <span id="serverLabel">Checking…</span>
+        </div>
+    </header>
+
+    <!-- ── Main ─────────────────────────────────────────── -->
+    <main class="main">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="eyebrow">Live Demo</div>
+            <h1>Your APIs, Instantly<br>Agent-Ready</h1>
+            <p>Register any production API once. Every AI agent on the platform can discover and call it — with auth,
+                encryption, and tenant isolation built in.</p>
+            <div class="hero-btns" style="flex-wrap: wrap;">
+                <input id="adminKeyInput" type="password" placeholder="Admin key (X-Admin-Key)"
+                    style="padding:0.6rem 1rem; border-radius:8px; border:1px solid #333; background:#111; color:#eee; min-width:280px; font-family:monospace;"
+                    autocomplete="off" />
+                <button class="btn btn-primary" id="runAllBtn" onclick="runFullDemo()">▶ &nbsp;Run Full Demo</button>
+                <button class="btn btn-ghost" onclick="resetDemo()">↺ &nbsp;Reset</button>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.6; margin-top:0.5rem;">
+                Admin endpoints require the X-Admin-Key header (see ADMIN_API_KEY in set_env.ps1). This demo is only
+                reachable when the server is started with DEMO_MODE=true.
+            </p>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps">
+
+            <!-- 1 -->
+            <div class="step-card" id="card-1">
+                <div class="step-header">
+                    <div class="step-num" id="num-1">1</div>
+                    <div class="step-meta">
+                        <div class="step-title">Onboard a Client Tenant</div>
+                        <div class="step-desc">Create an isolated workspace for Acme Corp. Every API and credential
+                            stays inside this boundary.</div>
+                    </div>
+                    <div id="action-1"><button class="btn btn-sm" onclick="runStep(1)">Run</button></div>
+                </div>
+                <div class="step-body" id="body-1"></div>
+            </div>
+
+            <!-- 2 -->
+            <div class="step-card" id="card-2">
+                <div class="step-header">
+                    <div class="step-num" id="num-2">2</div>
+                    <div class="step-meta">
+                        <div class="step-title">Issue an API Key</div>
+                        <div class="step-desc">Generate a bearer key for Acme Corp's agents. The raw key is shown once —
+                            only a SHA-256 hash is stored.</div>
+                    </div>
+                    <div id="action-2"><button class="btn btn-sm" onclick="runStep(2)">Run</button></div>
+                </div>
+                <div class="step-body" id="body-2"></div>
+            </div>
+
+            <!-- 3 -->
+            <div class="step-card" id="card-3">
+                <div class="step-header">
+                    <div class="step-num" id="num-3">3</div>
+                    <div class="step-meta">
+                        <div class="step-title">Register a Production API as a Tool</div>
+                        <div class="step-desc">Map GitHub's repo endpoint into the gateway. Tools appear on the next
+                            request — no restart needed.</div>
+                    </div>
+                    <div id="action-3"><button class="btn btn-sm" onclick="runStep(3)">Run</button></div>
+                </div>
+                <div class="step-body" id="body-3"></div>
+            </div>
+
+            <!-- 4 -->
+            <div class="step-card" id="card-4">
+                <div class="step-header">
+                    <div class="step-num" id="num-4">4</div>
+                    <div class="step-meta">
+                        <div class="step-title">AI Agent — Full MCP Round-Trip</div>
+                        <div class="step-desc">An agent connects, discovers the tool, calls it, and gets live data back
+                            — all via the MCP protocol.</div>
+                    </div>
+                    <div id="action-4"><button class="btn btn-sm" onclick="runStep(4)">Run</button></div>
+                </div>
+                <div class="step-body" id="body-4"></div>
+            </div>
+
+            <!-- 5 -->
+            <div class="step-card" id="card-5">
+                <div class="step-header">
+                    <div class="step-num" id="num-5">5</div>
+                    <div class="step-meta">
+                        <div class="step-title">Security — Unauthorized Requests Blocked</div>
+                        <div class="step-desc">Missing key and wrong key are both rejected before any MCP logic runs.
+                        </div>
+                    </div>
+                    <div id="action-5"><button class="btn btn-sm" onclick="runStep(5)">Run</button></div>
+                </div>
+                <div class="step-body" id="body-5"></div>
+            </div>
+
+            <!-- 6 -->
+            <div class="step-card" id="card-6">
+                <div class="step-header">
+                    <div class="step-num" id="num-6">6</div>
+                    <div class="step-meta">
+                        <div class="step-title">Tenant Isolation — Rival Corp Sees Nothing</div>
+                        <div class="step-desc">A second tenant authenticates successfully but their tool list is empty.
+                            Data never crosses tenant boundaries.</div>
+                    </div>
+                    <div id="action-6"><button class="btn btn-sm" onclick="runStep(6)">Run</button></div>
+                </div>
+                <div class="step-body" id="body-6"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        MCP Gateway &nbsp;·&nbsp; Insignytics &nbsp;·&nbsp; Built on the Model Context Protocol
+    </footer>
+
+    <script>
+        // ── State ────────────────────────────────────────────────
+        const S = { tenantId: null, apiKey: null };
+
+        // ── Server health ─────────────────────────────────────────
+        (async function ping() {
+            const pill = document.getElementById('serverPill');
+            const label = document.getElementById('serverLabel');
+            try {
+                const r = await fetch('/health');
+                if (r.ok) {
+                    pill.className = 'server-pill online';
+                    label.textContent = 'Server Online';
+                } else { throw 0; }
+            } catch {
+                pill.className = 'server-pill offline';
+                label.textContent = 'Server Offline';
+            }
+        })();
+
+        // ── API helper ────────────────────────────────────────────
+        async function api(url, method = 'GET', body = null) {
+            const opts = { method, headers: {} };
+            if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+            if (url.startsWith('/admin/')) {
+                const key = document.getElementById('adminKeyInput').value.trim();
+                opts.headers['X-Admin-Key'] = key;
+            }
+            const res = await fetch(url, opts);
+            const data = await res.json().catch(() => ({}));
+            return { ok: res.ok, status: res.status, data };
+        }
+
+        // ── UI helpers ────────────────────────────────────────────
+        function setCard(n, state) {
+            document.getElementById(`card-${n}`).className = 'step-card' + (state ? ` ${state}` : '');
+        }
+
+        function setAction(n, html) {
+            document.getElementById(`action-${n}`).innerHTML = html;
+        }
+
+        function openBody(n, html) {
+            const b = document.getElementById(`body-${n}`);
+            b.innerHTML = html;
+            b.className = 'step-body open';
+        }
+
+        function closeBody(n) {
+            const b = document.getElementById(`body-${n}`);
+            b.className = 'step-body';
+        }
+
+        function pill(text, cls) { return `<span class="pill pill-${cls}">${text}</span>`; }
+
+        function kv(label, val, mono = false) {
+            return `<div class="kv"><div class="kv-label">${label}</div><div class="kv-val${mono ? ' mono' : ''}">${val}</div></div>`;
+        }
+
+        function explain(html) { return `<div class="explain">${html}</div>`; }
+
+        function flowRow(icon, label, detail) {
+            return `<div class="flow-row">
+      <div class="flow-icon">${icon}</div>
+      <div class="flow-body">
+        <div class="flow-label">${label}</div>
+        ${detail ? `<div class="flow-detail">${detail}</div>` : ''}
+      </div>
+    </div>`;
+        }
+
+        // ── Step logic ────────────────────────────────────────────
+        const steps = {
+            1: async () => {
+                const r = await api('/admin/tenants', 'POST', { name: 'acme_corp' });
+                if (!r.ok) throw new Error(r.data.detail || 'Tenant creation failed');
+                S.tenantId = r.data.id;
+                openBody(1, `
+        <div class="kv-row">
+          ${kv('Tenant', r.data.name)}
+          ${kv('ID', r.data.id, true)}
+          ${kv('Status', pill('Active', 'green'))}
+        </div>
+        ${explain(`<strong>What this means:</strong> Acme Corp now has an isolated namespace in the gateway. Every API they register and every agent key they issue stays scoped to this tenant. No other company can see their tools or data.`)}
+      `);
+            },
+
+            2: async () => {
+                if (!S.tenantId) throw new Error('Run Step 1 first');
+                const r = await api(`/admin/tenants/${S.tenantId}/keys`, 'POST', { label: 'demo-key' });
+                if (!r.ok) throw new Error(r.data.detail || 'Key creation failed');
+                S.apiKey = r.data.api_key;
+                const masked = S.apiKey.slice(0, 13) + '●●●●●●●●●●●●●●●●●●●●●●●●●';
+                openBody(2, `
+        <div class="kv-row">
+          ${kv('Key (masked)', masked, true)}
+          ${kv('Storage', pill('Hash-only · SHA-256', 'amber'))}
+          ${kv('Visibility', pill('Shown once, never again', 'red'))}
+        </div>
+        ${explain(`<strong>What this means:</strong> This is like a password. We only store a one-way hash — even with full database access, the raw key cannot be recovered. The AI agent sends this key on every request.`)}
+      `);
+            },
+
+            3: async () => {
+                if (!S.tenantId) throw new Error('Run Step 1 first');
+                const r = await api('/admin/apis', 'POST', {
+                    tenant_id: S.tenantId,
+                    name: 'get_github_repo',
+                    description: 'Fetch public GitHub repository metadata',
+                    method: 'GET',
+                    url_template: 'https://api.github.com/repos/{owner}/{repo}',
+                    path_params: {
+                        owner: { type: 'string', description: 'GitHub org or username' },
+                        repo: { type: 'string', description: 'Repository name' }
+                    },
+                    static_headers: { Accept: 'application/vnd.github+json' }
+                });
+                if (!r.ok && r.status !== 409) throw new Error(r.data.detail || 'Registration failed');
+                openBody(3, `
+        <div class="kv-row">
+          ${kv('Tool Name', 'get_github_repo')}
+          ${kv('Method', pill('GET', 'blue'))}
+          ${kv('Endpoint', 'api.github.com/repos/{owner}/{repo}', true)}
+        </div>
+        ${explain(`<strong>What this means:</strong> The GitHub REST API is now registered as an MCP <em>tool</em>. The gateway exposes it dynamically — no restart needed. Any agent authenticating as Acme Corp will see it on their next connection.`)}
+      `);
+            },
+
+            4: async () => {
+                if (!S.apiKey) throw new Error('Run Steps 1 & 2 first');
+                const r = await api('/demo/mcp-roundtrip', 'POST', { api_key: S.apiKey });
+                if (!r.ok) throw new Error(r.data.detail || 'MCP round-trip failed');
+                const d = r.data;
+                const cr = d.call_result || {};
+                openBody(4, `
+        <div class="flow">
+          ${flowRow(pill('✓', 'green'), 'Session Initialized', 'Agent authenticated via X-API-Key &rarr; tenant resolved')}
+          ${flowRow(pill('✓', 'green'), 'Tools Discovered', d.tools.map(t => `<code>${t}</code>`).join(', ') || 'none')}
+          ${flowRow(pill('✓', 'green'), 'Tool Called', 'get_github_repo(owner="anthropics", repo="anthropic-sdk-python")')}
+        </div>
+        <div class="live-box">
+          <div class="live-label">⚡ Live response — fetched right now from GitHub</div>
+          <div class="live-stats">
+            <div>
+              <div class="live-stat-val">⭐ ${(cr.stars ?? 0).toLocaleString()}</div>
+              <div class="live-stat-key">GitHub Stars</div>
+            </div>
+            <div>
+              <div class="live-stat-val">${cr.language ?? '—'}</div>
+              <div class="live-stat-key">Language</div>
+            </div>
+            <div>
+              <div class="live-stat-val" style="font-size:1rem;margin-top:0.35rem">${cr.full_name ?? '—'}</div>
+              <div class="live-stat-key">Repository</div>
+            </div>
+          </div>
+        </div>
+        ${explain(`<strong>What this means:</strong> An AI agent connected to our MCP server, asked "what can I do?", received the GitHub tool, called it with parameters, and got real live data back. The agent never knew the URL, auth headers, or API format — the gateway handled everything.`)}
+      `);
+            },
+
+            5: async () => {
+                const noKey = await fetch('/mcp', { method: 'POST' }).then(r => r.status).catch(() => 'ERR');
+                const badKey = await fetch('/mcp', { method: 'POST', headers: { 'X-API-Key': 'lgfmcp_thisisnotreal0000000000000000' } }).then(r => r.status).catch(() => 'ERR');
+                openBody(5, `
+        <div class="blocked-list">
+          <div class="blocked-row">
+            <span class="blocked-label">Request with <code>no API key</code></span>
+            ${pill(`HTTP ${noKey} Unauthorized`, 'red')}
+          </div>
+          <div class="blocked-row">
+            <span class="blocked-label">Request with <code>invalid API key</code></span>
+            ${pill(`HTTP ${badKey} Unauthorized`, 'red')}
+          </div>
+        </div>
+        ${explain(`<strong>What this means:</strong> Both requests were stopped before any MCP logic ran. Auth is enforced at the transport layer — there is no path to the tool registry without a valid key tied to a real tenant.`)}
+      `);
+            },
+
+            6: async () => {
+                const t2 = await api('/admin/tenants', 'POST', { name: 'rival_corp' });
+                if (!t2.ok) throw new Error(t2.data.detail || 'Could not create rival tenant');
+                const k2 = await api(`/admin/tenants/${t2.data.id}/keys`, 'POST', { label: 'rival-key' });
+                if (!k2.ok) throw new Error(k2.data.detail || 'Could not create rival key');
+                const r = await api('/demo/mcp-roundtrip', 'POST', { api_key: k2.data.api_key });
+                if (!r.ok) throw new Error(r.data.detail || 'MCP round-trip failed');
+                openBody(6, `
+        <div class="kv-row">
+          ${kv('Tenant', 'rival_corp')}
+          ${kv('Key', pill('Valid — connection accepted', 'green'))}
+          ${kv('Tools visible', pill('0 — empty list', 'red'))}
+        </div>
+        <div class="flow">
+          ${flowRow(pill('✓', 'green'), 'Authentication Passed', 'Rival Corp has a valid key — connection accepted')}
+          ${flowRow(pill('0', 'red'), 'Tool Discovery: Empty', "Acme Corp's tools are invisible to this tenant")}
+        </div>
+        ${explain(`<strong>What this means:</strong> Rival Corp authenticated fine — the gateway knows who they are. But every DB query is scoped by tenant ID, so they see zero tools. It's not hidden; it simply doesn't exist in their namespace. Isolation is enforced at the data layer, not the application layer.`)}
+      `);
+            }
+        };
+
+        // ── Run a single step ──────────────────────────────────────
+        async function runStep(n) {
+            setCard(n, 'active');
+            setAction(n, '<div class="spinner"></div>');
+            closeBody(n);
+            try {
+                await steps[n]();
+                setCard(n, 'done');
+                document.getElementById(`num-${n}`).textContent = '✓';
+            } catch (e) {
+                setCard(n, 'errored');
+                openBody(n, `<div class="kv"><div class="kv-label">Error</div><div class="kv-val" style="color:var(--red)">${e.message}</div></div>`);
+            } finally {
+                setAction(n, `<button class="btn btn-sm" onclick="runStep(${n})">Re-run</button>`);
+            }
+        }
+
+        // ── Run all steps sequentially ────────────────────────────
+        async function runFullDemo() {
+            const btn = document.getElementById('runAllBtn');
+            btn.disabled = true;
+            btn.textContent = 'Resetting…';
+
+            // The DB persists across container restarts (named volume), but
+            // this page's in-memory state (S.tenantId etc) does not. Without
+            // a reset here, re-running the demo after a reload hits 409s on
+            // step 1/6 (tenants already exist) and cascades into "Run Step 1
+            // first" on everything downstream. Always start from a clean DB.
+            const r = await api('/demo/reset', 'POST');
+            if (!r.ok) {
+                alert('Auto-reset failed before running demo: ' + JSON.stringify(r.data));
+                btn.disabled = false;
+                btn.textContent = '▶  Run Full Demo';
+                return;
+            }
+            S.tenantId = null; S.apiKey = null;
+            for (let i = 1; i <= 6; i++) {
+                setCard(i, null);
+                closeBody(i);
+                document.getElementById(`num-${i}`).textContent = i;
+            }
+
+            btn.textContent = 'Running…';
+            for (let i = 1; i <= 6; i++) {
+                await runStep(i);
+                await new Promise(r => setTimeout(r, 350));
+            }
+            btn.disabled = false;
+            btn.textContent = '▶  Run Full Demo';
+        }
+
+        // ── Reset ─────────────────────────────────────────────────
+        async function resetDemo() {
+            if (!confirm('Reset database and clear all demo data?')) return;
+            const r = await api('/demo/reset', 'POST');
+            if (!r.ok) { alert('Reset failed: ' + JSON.stringify(r.data)); return; }
+            S.tenantId = null; S.apiKey = null;
+            for (let i = 1; i <= 6; i++) {
+                setCard(i, null);
+                closeBody(i);
+                document.getElementById(`num-${i}`).textContent = i;
+                setAction(i, `<button class="btn btn-sm" onclick="runStep(${i})">Run</button>`);
+            }
+        }
+    </script>
+</body>
+
+</html>

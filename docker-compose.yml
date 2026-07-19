@@ -1,0 +1,47 @@
+# Requires FERNET_KEY, ADMIN_API_KEY, and POSTGRES_PASSWORD to be set in the
+# environment (or a .env file next to this compose file -- gitignored).
+# There are no hardcoded defaults here on purpose: a missing var should
+# fail `docker-compose up`, not silently stand up a well-known password.
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: mcp-pg-compose
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      POSTGRES_DB: mcp_gateway
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d mcp_gateway" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@db:5432/mcp_gateway
+      FERNET_KEY: ${FERNET_KEY:?FERNET_KEY must be set}
+    command: python migrate.py
+    depends_on:
+      db:
+        condition: service_healthy
+
+  server:
+    build: .
+    container_name: mcp-server
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@db:5432/mcp_gateway
+      FERNET_KEY: ${FERNET_KEY:?FERNET_KEY must be set}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:?ADMIN_API_KEY must be set}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:

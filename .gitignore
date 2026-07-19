@@ -1,0 +1,7 @@
+set_env.ps1
+.env
+.env.*
+*.pyc
+__pycache__/
+.venv/
+venv/
